@@ -49,7 +49,7 @@ read_element2(Element) -->
    { code_type(C1, to_lower(C10)),
      code_type(C2, to_lower(C20)),
      atom_codes(Element, [C1, C2]),
-     element(Element, _)
+     element(Element, _, _)
    }.
 
 % bi is red as B
@@ -57,7 +57,7 @@ read_element1(Element) -->
    [C10], 
    { code_type(C1, to_lower(C10)),
      atom_codes(Element, [C1]),
-     element(Element, _)
+     element(Element, _, _)
    }.
 
 read_index(N) -->
