@@ -64,12 +64,7 @@ next_element([shell(ST, SN, EN)|T], Element) :-
                                 %   K is K0 + NN,
 
 show_all_elements :-
-   ignore(show_all_elements([shell(s, 1, 1)])).
-
-show_all_elements(E) :-
-   show_element(E),
-   next_element(E, E1),
-   show_all_elements(E1).
+   forall(element_shells(_, S), show_element(S)).
 
 show_element(E) :-
    show_element(E, 0).
