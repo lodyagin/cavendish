@@ -2,7 +2,8 @@
           [element_shells/2,
            next_element/2,
            show_all_elements/0,
-           show_element/1
+           show_element/1,
+           to_shells/2
           ]).
 
 :- use_module(elements).
@@ -87,5 +88,14 @@ assert_all_elements(Shells, EN) :-
    succ(EN, EN1),
    assert_all_elements(Shells1, EN1).
 
+to_shells(L, L) :-
+   L = [_|_], !.
+to_shells(El, L) :-
+   atom(El), !,
+   element(El, EN),
+   element_shells(EN, L), !.
+to_shells(EN, L) :-
+   integer(EN), !,
+   element_shells(EN, L), !.
 
 :- initialization((build_shell_seq, assert_all_elements)).

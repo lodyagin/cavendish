@@ -1,28 +1,10 @@
 :- module(elements,
-          [element/3,
-           valency/2,
-           reassert_valencies/0
+          [element/2
           ]).
 
-:- dynamic valency/2.
 
-%connect_elements(E1, E2, bond(atom(1, E1, Cha1), atom(2, E1, Cha2))) :-
-%   valency(E1, V1),
-%   integer(V1), % no covalency yet
-%   valency(E2, V2),
-%   integer(V2),
-%   Cha1 is V1 
-                
-reassert_valencies :-
-   retractall(valency(_, _)),
-   (  element(Element, _, ValList),
-      member(Val, ValList),
-      assertz(valency(Element, Val)),
-      fail
-   ;
-      true
-   ).
-    
+element(Name, EN) :- element(Name, EN, _).
+
 element(h, 1, [+1, -1, cov(1), hyd]).
 element(he, 2, []).
 element(li, 3, [+1, cov(1)]).
@@ -115,32 +97,31 @@ element(ac, 89, [+3]).
 element(th, 90, [+4]).
 element(pa, 91, []).
 element(u, 92, []).
-element(np, 93, []).
-element(pu, 94, []).
-element(am, 95, []).
-element(cm, 96, []).
-element(bk, 97, []).
-element(cf, 98, []).
-element(es, 99, []).
-element(fm, 100, []).
-element(md, 101, []).
-element(no, 102, []).
-element(lr, 103, []).
-element(rf, 104, []).
-element(db, 105, []).
-element(sg, 106, []).
-element(bh, 107, []).
-element(hs, 108, []).
-element(mr, 109, []).
-element(ds, 110, []).
-element(rg, 111, []).
-element(cn, 112, []).
-element(nh, 113, []).
-element(fl, 114, []).
-element(mc, 115, []).
-element(lv, 116, []).
-element(ts, 117, []).
-element(og, 118, []).
+%element(np, 93, []).
+%element(pu, 94, []).
+%element(am, 95, []).
+%element(cm, 96, []).
+%element(bk, 97, []).
+%element(cf, 98, []).
+%element(es, 99, []).
+%element(fm, 100, []).
+%element(md, 101, []).
+%element(no, 102, []).
+%element(lr, 103, []).
+%element(rf, 104, []).
+%element(db, 105, []).
+%element(sg, 106, []).
+%element(bh, 107, []).
+%element(hs, 108, []).
+%element(mr, 109, []).
+%element(ds, 110, []).
+%element(rg, 111, []).
+%element(cn, 112, []).
+%element(nh, 113, []).
+%element(fl, 114, []).
+%element(mc, 115, []).
+%element(lv, 116, []).
+%element(ts, 117, []).
+%element(og, 118, []).
 
-:- initialization(reassert_valencies).
 
