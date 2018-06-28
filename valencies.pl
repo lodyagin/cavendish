@@ -1,33 +1,42 @@
 :- module(valencies,
-          [group/3,
-           valency/2
+          [group/2,
+           valency/3
           ]).
 
 :- use_module(shells).
 
-valency(Element, Valency) :-
+valency(Element, Valency, Group) :-
    var(Element), !,
-   valency_by_shell(_, Valency, EN),
+   valency_by_shell(_, Group, Valency, EN),
    element(Element, EN).
-valency(Element, Valency) :-
+valency(Element, Valency, Group) :-
    to_shells(Element, Shells),
-   valency_by_shell(Shells, Valency, _).
+   valency_by_shell(Shells, Group, Valency, _).
 
-% valency_by_shell(?Shells, ?Valency, ?EN) is nondet.
-valency_by_shell(Shells, Valency, EN) :-
-   group(Shells, group(s, Valency), EN).
-valency_by_shell(Shells, Valency, EN) :-
-   group(Shells, group(p, I), EN),
+group(Element, Group) :-
+   var(Element), !,
+   group_by_shell(_, Group, EN),
+   element(Element, EN).
+group(Element, Group) :-
+   to_shells(Element, Shells),
+   group_by_shell(Shells, Group, _).
+
+valency_by_shell(Shells, Group, Valency, EN) :-
+   Group = group(s, Valency),
+   group_by_shell(Shells, Group, EN).
+valency_by_shell(Shells, Group, Valency, EN) :-
+   Group = group(p, I),
+   group_by_shell(Shells, Group, EN),
    I =:= 5,
-   Valency is 6 - I.
+   Valency is I - 6.
 
-
-group([shell(s, 1, 2)], 0, 2).
-group(Shells, 0, EN) :-
+group_by_shell([shell(s, 1, 1)], h, 1).  % H
+group_by_shell([shell(s, 1, 2)], 0, 2).  % Ne
+group_by_shell(Shells, 0, EN) :-         % Other nobles
    Shells = [shell(p, _, 6)|_],
    element_shells(EN, Shells).
-group(Shells, group(T, I), EN) :-
+group_by_shell(Shells, group(T, I), EN) :- % The rest
    Shells = [shell(T, N, I)|_],
    element_shells(EN, Shells),
-   \+ ((T = s, N = 1, I = 2) ; (T = p, I = 6)).
+   \+ ((T = s, N = 1) ; (T = p, I = 6)).
 
