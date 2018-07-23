@@ -1,9 +1,11 @@
 :- module(valencies,
           [group/2,
-           valency/3
+           valency/3,
+           periodic_line_group/3
           ]).
 
 :- use_module(shells).
+:- use_module(elements).
 
 valency(Element, Valency, Group) :-
    var(Element), !,
@@ -20,6 +22,27 @@ group(Element, Group) :-
 group(Element, Group) :-
    to_shells(Element, Shells),
    group_by_shell(Shells, Group, _).
+
+group_number_by_shells([shell(s, 1, 1)|_], 1) :- !.
+group_number_by_shells([shell(s, 1, 2)|_], 18) :- !.
+group_number_by_shells([shell(s, _, I)|_], I) :- !.
+group_number_by_shells([shell(p, _, I1)|_], I) :- !,
+   I is I1 + 12.
+group_number_by_shells([shell(d, _, I1), shell(s, _, I2)|_], I) :- !,
+   I is I1 + I2.
+group_number_by_shells([shell(f, _, _)|_], 3).
+
+line_number_by_shells([shell(p, Line, _)|_], Line) :- !.
+line_number_by_shells([shell(s, Line, _)|_], Line) :- !.
+line_number_by_shells([shell(d, Line1, _)|_], Line) :- !,
+   succ(Line1, Line).
+line_number_by_shells([shell(f, Line1, _)|_], Line) :-
+   Line is Line1 + 2.
+
+periodic_line_group(Element, Line, Group) :-
+   to_shells(Element, Shells),
+   group_number_by_shells(Shells, Group),
+   line_number_by_shells(Shells, Line).
 
 valency_by_shell(Shells, Group, Valency, EN) :-
    Group = group(s, Valency),

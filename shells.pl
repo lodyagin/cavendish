@@ -75,7 +75,7 @@ show_element([shell(ST, SN, EN)|T], ElectronCnt) :- !,
    ElectronCnt1 is ElectronCnt + EN,
    show_element(T, ElectronCnt1).
 show_element([], ElectronCnt) :-
-   element(Element, ElectronCnt, _),
+   element(Element, ElectronCnt),
    format("(~a)~n", [Element]).
 
 assert_all_elements :-
