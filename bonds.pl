@@ -60,6 +60,9 @@ lewis_vertices2(E0, [E1|T], L0, L) :-
    ),
    lewis_vertices2(E0, T, L1, L).
 
+lewis_group([E], m(E)) :-
+   is_metal(E), !.
+
 bond(E1, E2, ionic(N1*E1^V1, N2*E2^V2)) :-
    valency(E1, V1, G1),
    valency(E2, V2, G2),
