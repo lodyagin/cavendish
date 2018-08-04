@@ -60,9 +60,21 @@ lewis_vertices2(E0, [E1|T], L0, L) :-
    ),
    lewis_vertices2(E0, T, L1, L).
 
-lewis_group([E], m(E)) :-
-   is_metal(E), !.
+lewis_group(C0, C, m(E)) :-
+   select(E, C0, C), is_metal(E).
+lewis_group(L0, L, r(N)) :- % alkyl
+   selectchk(h, L0, L1),
+   alkyl_minus(L1, 0, L, N),
+   N > 0.
 
+alkyl_minus(L0, N0, L, N) :- % removes CH2 component from L0 N times
+   selectchk(c, L0, L1),
+   selectchk(h, L1, L2),
+   selectchk(h, L2, L3),
+   succ(N0, N1),
+   alkyl_minus(L3, N1, L, N).
+alkyl_minus(L, N, L, N).
+   
 bond(E1, E2, ionic(N1*E1^V1, N2*E2^V2)) :-
    valency(E1, V1, G1),
    valency(E2, V2, G2),

@@ -1,7 +1,8 @@
 :- module(valencies,
           [group/2,
-           valency/3,
-           periodic_line_group/3
+           is_metal/1,
+           periodic_line_group/3,
+           valency/3
           ]).
 
 :- use_module(shells).
@@ -43,6 +44,20 @@ periodic_line_group(Element, Line, Group) :-
    to_shells(Element, Shells),
    group_number_by_shells(Shells, Group),
    line_number_by_shells(Shells, Line).
+
+%last_metal(Line, Group)
+last_metal(1, 0).
+last_metal(2, 2).
+last_metal(3, 13).
+last_metal(4, 13).
+last_metal(5, 14).
+last_metal(6, 16).
+last_metal(7, 16).
+
+is_metal(Element) :-
+   periodic_line_group(Element, Line, Group),
+   last_metal(Line, LastMetalGroup), !,
+   Group =< LastMetalGroup.
 
 valency_by_shell(Shells, Group, Valency, EN) :-
    Group = group(s, Valency),
