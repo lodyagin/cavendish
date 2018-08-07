@@ -11,6 +11,8 @@
 
 :- dynamic lewis_group/3.
 
+:- initialization retractall(lewis_group(_, _, _)), init_lewis_groups.
+
 %% rep(Element, Num, ElList)
 rep(_, 0, []) :- !.
 rep(Element, Num, [Element|PrevList]) :-
@@ -67,24 +69,41 @@ lewis_vertices2(E0, [E1|T], L0, L) :-
 % Select groups of elements from L0 forming L and Group.
 
 %experimental
+assert_lewis_group(Term, (-A)^_-(-B)^_) :- !,
+   assert_lewis_group2(Term, A, B).
+assert_lewis_group(Term, (-A)^_-B^_) :- !,
+   assert_lewis_group2(Term, A, B).
+assert_lewis_group(Term, A^_-(-B)^_) :- !,
+   assert_lewis_group2(Term, A, B).
 assert_lewis_group(Term, A^_-B^_) :- !,
-   assertz((lewis_group(L0, L, Term) :-
-               select_group(A, L0, L1),
-               select_group(B, L1, L))).
+   assert_lewis_group2(Term, A, B).
 assert_lewis_group(Term, A^AC-B) :- !,
    assert_lewis_group(Term, A^AC-B^0).
 assert_lewis_group(Term, A-B^BC) :- !,
    assert_lewis_group(Term, A^0-B^BC).
 assert_lewis_group(Term, A-B) :- !,
    assert_lewis_group(Term, A^0-B^0).
+assert_lewis_group(Term, (-A)^_) :- !,
+   assert_lewis_group2(Term, A).
+assert_lewis_group(Term, A^_) :- !,
+   assert_lewis_group2(Term, A).
 assert_lewis_group(Term, El) :-
    atom(El), !,
    assertz((lewis_group(L0, L, Term) :- selectchk(El, L0, L))).
-
+assert_lewis_group(Term, A-B) :- !,
+   assert_lewis_group(Term, A^0-B^0).
 assert_lewis_group(r(N)) :-
    assertz((lewis_group(L0, L, r(N)) :- select_group(r(N), L0, L))).
 assert_lewis_group(x(Group)) :-
    assert_lewis_group(x(Group), Group).
+
+assert_lewis_group2(Term, A) :-
+   assertz((lewis_group(L0, L, Term) :-
+               select_group(A, L0, L))).
+assert_lewis_group2(Term, A, B) :-
+   assertz((lewis_group(L0, L, Term) :-
+               select_group(A, L0, L1),
+               select_group(B, L1, L))).
 
 select_group(r(N), L0, L) :- % alkyl
    selectchk(h, L0, L1),
@@ -94,14 +113,12 @@ select_group(El, L0, L) :-
    atom(El),
    selectchk(El, L0, L).
 
-:- initialization retractall(lewis_group(_, _, _)), init_lewis_groups.
-
 init_lewis_groups :-
    assert_lewis_group(r(_)), % r
    forall( % x
           member(G,
                  [h, f, cl, br, i,
-                  o^(-1)-h, o^(-1)-r(_)
+                  -o-h, -o-r(_), -s-r(_), -se-r(_), (-o)^(-1), (-s)^(-1)
                  ]),
           assert_lewis_group(x(G))
          ).
