@@ -9,6 +9,8 @@
 :- use_module(library(ugraphs)).
 :- use_module(valencies).
 
+:- dynamic lewis_group/3.
+
 %% rep(Element, Num, ElList)
 rep(_, 0, []) :- !.
 rep(Element, Num, [Element|PrevList]) :-
@@ -60,12 +62,72 @@ lewis_vertices2(E0, [E1|T], L0, L) :-
    ),
    lewis_vertices2(E0, T, L1, L).
 
-lewis_group(C0, C, m(E)) :-
-   select(E, C0, C), is_metal(E).
-lewis_group(L0, L, r(N)) :- % alkyl
+% lewis_group(+L0, -L, -Group) is nondet.
+% L0 must be an ordered list of elements
+% Select groups of elements from L0 forming L and Group.
+
+%experimental
+assert_lewis_group(Term, A^_-B^_) :- !,
+   assertz((lewis_group(L0, L, Term) :-
+               select_group(A, L0, L1),
+               select_group(B, L1, L))).
+assert_lewis_group(Term, A^AC-B) :- !,
+   assert_lewis_group(Term, A^AC-B^0).
+assert_lewis_group(Term, A-B^BC) :- !,
+   assert_lewis_group(Term, A^0-B^BC).
+assert_lewis_group(Term, A-B) :- !,
+   assert_lewis_group(Term, A^0-B^0).
+assert_lewis_group(Term, El) :-
+   atom(El), !,
+   assertz((lewis_group(L0, L, Term) :- selectchk(El, L0, L))).
+
+assert_lewis_group(r(N)) :-
+   assertz((lewis_group(L0, L, r(N)) :- select_group(r(N), L0, L))).
+assert_lewis_group(x(Group)) :-
+   assert_lewis_group(x(Group), Group).
+
+select_group(r(N), L0, L) :- % alkyl
    selectchk(h, L0, L1),
    alkyl_minus(L1, 0, L, N),
    N > 0.
+select_group(El, L0, L) :-
+   atom(El),
+   selectchk(El, L0, L).
+
+:- initialization retractall(lewis_group(_, _, _)), init_lewis_groups.
+
+init_lewis_groups :-
+   assert_lewis_group(r(_)), % r
+   forall( % x
+          member(G,
+                 [h, f, cl, br, i,
+                  o^(-1)-h, o^(-1)-r(_)
+                 ]),
+          assert_lewis_group(x(G))
+         ).
+
+
+% lewis_group(L0, L, x(E)) :-
+%    select(E, L0, L), memberchk(E, [h, f, cl, br, i]).
+% lewis_group(L0, L, x(compound([o^(-1)-h]))) :-  % -OH 
+%    selectchk(o, L0, L1),
+%    selectchk(h, L1, L).
+% lewis_group(L0, L, x(compound([E^(-1)-r(N)]))) :- % -OR, -SR, -SeR
+%    (  selectchk(o, L0, L1)
+%    ;  selectchk(s, L0, L1)
+%    ;  selectchk(se, L0, L1)
+%    ),
+%    lewis_group(L1, L, r(N)).
+% lewis_group(L0, L, x(E^(-2))) :-  % -O-, -S-
+%    (  selectchk(o, L0, L1)
+%    ;  selectchk(s, L0, L1)
+%    ).
+% lewis_group(L0, L, m(E)) :-
+%    select(E, L0, L), is_metal(E).
+% lewis_group(L0, L, r(N)) :- % alkyl
+%    selectchk(h, L0, L1),
+%    alkyl_minus(L1, 0, L, N),
+%    N > 0.
 
 alkyl_minus(L0, N0, L, N) :- % removes CH2 component from L0 N times
    selectchk(c, L0, L1),
